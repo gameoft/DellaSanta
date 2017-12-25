@@ -12,5 +12,7 @@ namespace DellaSanta.Models
         public string ClaimType { get; set; }
         public string ClaimValue { get; set; }
 
+        public virtual User User { get; set; }
+
     }
 }
