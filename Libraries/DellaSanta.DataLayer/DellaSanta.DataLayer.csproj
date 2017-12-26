@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationDbContext.cs" />
+    <Compile Include="Mapping\CourseConfiguration.cs" />
+    <Compile Include="Mapping\CoursePathConfiguration.cs" />
+    <Compile Include="Mapping\EnrolledClassConfiguration.cs" />
     <Compile Include="Mapping\UserClaimsConfiguration.cs" />
     <Compile Include="Mapping\UserConfiguration.cs" />
     <Compile Include="Migrations\201712252244010_initial.cs" />

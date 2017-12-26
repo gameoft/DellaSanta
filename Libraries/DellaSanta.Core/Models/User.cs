@@ -18,5 +18,9 @@ namespace DellaSanta.Core
 
         public virtual ICollection<UserClaims> Claims { get; set; }
 
+        public ICollection<EnrolledClass> StudentEnrollments { get; set; }
+        public ICollection<Course> CoursesTaught { get; set; }
+
+
     }
 }
