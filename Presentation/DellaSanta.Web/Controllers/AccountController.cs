@@ -20,7 +20,6 @@ namespace DellaSanta.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private ApplicationDbContext _applicationDbContext = new ApplicationDbContext();
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authenticationService;
 
