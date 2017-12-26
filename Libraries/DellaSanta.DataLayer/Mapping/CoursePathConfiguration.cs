@@ -14,9 +14,6 @@ namespace DellaSanta.DataLayer
     {
         public CoursePathConfiguration()
         {
-            //Property(c => c.StudentId).HasColumnName("StudentId");
-
-
             Property(c => c.CoursePathName)
                 .HasMaxLength(250)
                 .IsFixedLength()

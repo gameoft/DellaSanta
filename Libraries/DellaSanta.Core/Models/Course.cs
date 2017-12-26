@@ -12,12 +12,12 @@ namespace DellaSanta.Core
         public string CourseName { get; set; }
 
         public virtual User Teacher { get; set; }
-        public string TeacherId { get; set; }
+        public int TeacherId { get; set; }
 
         public int CoursePathId { get; set; }
         public virtual CoursePath CoursePath { get; set; }
 
-        public virtual ICollection<EnrolledClass> EnrolledClasses { get; set; }
+        public ICollection<EnrolledClass> EnrolledClasses { get; set; }
 
     }
 }

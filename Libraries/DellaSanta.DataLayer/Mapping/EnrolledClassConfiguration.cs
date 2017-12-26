@@ -12,23 +12,29 @@ namespace DellaSanta.DataLayer
     {
         public EnrolledClassConfiguration()
         {
-
-            //// Configure StudentId as PK for StudentAddress
-            //HasKey(c => c.StudentId);
-
-            //// Property(c => c.StudentId).HasColumnName("StudentId");
-
-
+            
+            HasKey(c => new { c.StudentId, c.CourseId });
+            
             Property(c => c.CourseName)
                 .HasMaxLength(250)
                 .IsFixedLength()
                 .IsRequired();
 
+            Property(c => c.ExamDate)
+              .IsOptional();
 
+            Property(c => c.ExamGrade)
+              .IsOptional();
+            
             HasRequired<User>(x => x.Student)
                 .WithMany(x => x.StudentEnrollments)
-                .HasForeignKey<string>(x => x.StudentId)
+                .HasForeignKey<int>(x => x.StudentId)
                 .WillCascadeOnDelete(false);
+            
+            //HasRequired<Course>(x => x.Course)
+            // .WithMany(x => x.EnrolledClasses)
+            // .HasForeignKey<int>(x => x.CourseId)
+            // .WillCascadeOnDelete(false);
 
         }
     }

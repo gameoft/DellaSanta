@@ -23,6 +23,7 @@ namespace DellaSanta.Migrations
             //  You can use the DbSet<T>.AddOrUpdate() helper extension method 
             //  to avoid creating duplicate seed data.
 
+            #region users
             //User Admin
             //if (context.Users.Where(r => r.UserName == "admin@school.com").Count() == 0)
             context.Users.AddOrUpdate(
@@ -84,7 +85,79 @@ namespace DellaSanta.Migrations
                     c => c.UserId,
                     new User { UserName = "student4@school.com", Password = "school", Role = "Student", Active = true, UserId = 7, FirstName = "S4Name", LastName = "S4Surname" });
 
+            #endregion users
+
+            #region coursepaths
+
+            context.CoursePaths.AddOrUpdate(
+                c => c.CoursePathId,
+                new CoursePath
+                {
+                    CoursePathId = 1,
+                    CoursePathName = "Applied Math"
+                });
+
+
+            context.CoursePaths.AddOrUpdate(
+                c => c.CoursePathId,
+                new CoursePath
+                {
+                    CoursePathId = 2,
+                    CoursePathName = "Logistics"
+                });
+
+            context.SaveChanges();
+
+            #endregion coursepaths
+
+            #region course
+
+            var teacher1 = context.Users.Where(x => x.UserName== "teacher1@school.com").First();
+
+            context.Courses.AddOrUpdate(
+                c => c.CourseId,
+                new Course
+                {
+                    CourseId = 1,
+                    CourseName = "Mathematics 1",
+                    CoursePathId = 1,
+                    TeacherId = teacher1.UserId
+                });
+
+            var teacher2 = context.Users.Where(x => x.UserName == "teacher2@school.com").First(); 
+
+            context.Courses.AddOrUpdate(
+                c => c.CourseId,
+                new Course
+                {
+                    CourseId = 2,
+                    CourseName = "Mathematics 2",
+                    CoursePathId = 1,
+                    TeacherId = teacher2.UserId
+                });
+
+            context.SaveChanges();
+
+            #endregion course
+
+            #region enrolledclasses
+            var student1 = context.Users.Where(x => x.UserName == "student1@school.com").First();
+            var courseenrolled = context.Courses.Where(x => x.CourseName == "Mathematics 1").First();
             
+
+            context.EnrolledClasses.AddOrUpdate(
+            c => new { c.CourseId, c.StudentId },
+            new EnrolledClass
+            {
+                CourseId = courseenrolled.CourseId,
+                CourseName = courseenrolled.CourseName,
+                 StudentId = student1.UserId,
+                  StudentName = student1.UserName
+                 
+            });
+
+            #endregion enrolledclasses
+
 
 
         }

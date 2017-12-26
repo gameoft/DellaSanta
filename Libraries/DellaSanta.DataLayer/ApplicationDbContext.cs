@@ -21,14 +21,18 @@ namespace DellaSanta.DataLayer
 
         public DbSet<User> Users { get; set; }
         public DbSet<UserClaims> Claims { get; set; }
-        //public DbSet<Student> Students { get; set; }
-        //public DbSet<StudentAddress> StudentAddresses { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<CoursePath> CoursePaths { get; set; }
+        public DbSet<EnrolledClass> EnrolledClasses { get; set; }
 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new UserConfiguration());
             modelBuilder.Configurations.Add(new UserClaimsConfiguration());
+            modelBuilder.Configurations.Add(new CourseConfiguration());
+            modelBuilder.Configurations.Add(new CoursePathConfiguration());
+            modelBuilder.Configurations.Add(new EnrolledClassConfiguration());
 
 
             base.OnModelCreating(modelBuilder); 

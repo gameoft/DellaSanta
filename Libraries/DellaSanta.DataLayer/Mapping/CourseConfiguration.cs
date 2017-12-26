@@ -12,13 +12,7 @@ namespace DellaSanta.DataLayer
     {
         public CourseConfiguration()
         {
-
-            //// Configure StudentId as PK for StudentAddress
-            //HasKey(c => c.StudentId);
-
-            //// Property(c => c.StudentId).HasColumnName("StudentId");
-
-
+            
             Property(c => c.CourseName)
                 .HasMaxLength(250)
                 .IsFixedLength()
@@ -30,9 +24,10 @@ namespace DellaSanta.DataLayer
             .HasForeignKey<int>(s => s.CourseId)
             .WillCascadeOnDelete(false);
 
+
             HasRequired<User>(x => x.Teacher)
                 .WithMany(x => x.CoursesTaught)
-                .HasForeignKey<string>(x => x.TeacherId)
+                .HasForeignKey<int>(x => x.TeacherId)
                 .WillCascadeOnDelete(false);
         }
     }
