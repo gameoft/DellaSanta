@@ -7,7 +7,7 @@ namespace DellaSanta.Migrations
     using System.Security.Claims;
     using DellaSanta.Core;
     using DellaSanta.DataLayer;
-    using DellaSanta.Services;
+    
 
 
     internal sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>

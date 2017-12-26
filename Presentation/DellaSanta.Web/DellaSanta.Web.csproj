@@ -287,6 +287,10 @@
       <Project>{0d9b1ce9-2e87-4adf-b9fe-01146d803032}</Project>
       <Name>DellaSanta.Services</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dellasanta.Web.Common\Dellasanta.Web.Common.csproj">
+      <Project>{2411f60b-1d91-4e09-91fb-ec8140fe1a4b}</Project>
+      <Name>Dellasanta.Web.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

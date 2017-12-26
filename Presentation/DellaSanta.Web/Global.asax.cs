@@ -9,6 +9,10 @@ using System.Web.Helpers;
 using System.Security.Claims;
 using Autofac;
 using System.Configuration;
+using DellaSanta.Services;
+using DellaSanta.DataLayer;
+using Autofac.Integration.Mvc;
+using Dellasanta.Web.Common.Security;
 
 namespace DellaSanta
 {
@@ -30,10 +34,15 @@ namespace DellaSanta
         {
             var builder = new ContainerBuilder();
             string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-            
-            ConfigureLog4Net(builder, connectionString);
 
+            //ConfigureLog4Net(builder, connectionString);
 
+            // Register your MVC controllers. (MvcApplication is the name of
+            // the class in Global.asax.)
+            builder.RegisterControllers(typeof(MvcApplication).Assembly);
+
+            // OPTIONAL: Register web abstractions like HttpContextBase.
+            builder.RegisterModule<AutofacWebTypesModule>();
 
             // HttpContext
             //builder.Register(c => new HttpContextWrapper(HttpContext.Current) as HttpContextBase).As<HttpContextBase>().InstancePerLifetimeScope();
@@ -42,7 +51,7 @@ namespace DellaSanta
             //builder.Register(c => c.Resolve<HttpContextBase>().Server).As<HttpServerUtilityBase>().InstancePerLifetimeScope();
             //builder.Register(c => c.Resolve<HttpContextBase>().Session).As<HttpSessionStateBase>().InstancePerLifetimeScope();
 
-            //// Services
+            // Services
             //builder.RegisterType<ActiveDirectoryService>().As<IActiveDirectoryService>().InstancePerLifetimeScope();
             //builder.RegisterType<DateTimeAdapter>().As<IDateTime>().InstancePerLifetimeScope();
             //builder.RegisterType<DomainService>().As<IDomainService>().InstancePerLifetimeScope();
@@ -51,11 +60,14 @@ namespace DellaSanta
             //builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
             //builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();
             //builder.RegisterType<MemoryCacheService>().As<ICacheService>().SingleInstance();
-            //builder.RegisterType<OwinAuthenticationService>().As<IAuthenticationService>().InstancePerLifetimeScope();
+            builder.RegisterType<OwinAuthenticationService>().As<IAuthenticationService>().InstancePerLifetimeScope();
             //builder.RegisterType<RoleService>().As<IRoleService>().InstancePerLifetimeScope();
             //builder.RegisterType<SettingService>().As<ISettingService>().InstancePerLifetimeScope();
             //builder.RegisterType<TraceLogService>().As<ITraceLogService>().InstancePerLifetimeScope();
-            //builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
+
+            builder.RegisterType<ApplicationDbContext>().As<ApplicationDbContext>().InstancePerLifetimeScope();
+            builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
+
 
             //// Trace listener
             //builder.RegisterType<DatabaseTraceListener>().As<ITraceListener>()
@@ -71,9 +83,14 @@ namespace DellaSanta
 
             //// Register Mvc filters
             //builder.RegisterFilterProvider();
+
+            // Set the dependency resolver to be Autofac.
+            var container = builder.Build();
+            DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
+            
         }
 
-        private void ConfigureLog4Net(ContainerBuilder builder, string connectionString)
+    private void ConfigureLog4Net(ContainerBuilder builder, string connectionString)
         {
             //Log4NetLogger.Configure(connectionString);
             //builder.Register(c => new LogManagerAdapter()).As<ILogManager>().InstancePerLifetimeScope();
@@ -133,6 +150,8 @@ namespace DellaSanta
             //        controller.Execute(requestContext);
             //    }
             //}
+
+           
         }
 
 

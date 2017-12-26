@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DellaSanta.Services
+namespace DellaSanta.DataLayer
 {
     public class Utils
     {

@@ -13,6 +13,7 @@ using System.Text;
 using DellaSanta.Core;
 using DellaSanta.Services;
 using System.Collections.Generic;
+using Dellasanta.Web.Common.Security;
 
 namespace DellaSanta.Controllers
 {
@@ -20,9 +21,15 @@ namespace DellaSanta.Controllers
     public class AccountController : Controller
     {
         private ApplicationDbContext _applicationDbContext = new ApplicationDbContext();
+        private readonly IUserService _userService;
+        private readonly IAuthenticationService _authenticationService;
 
-        public AccountController()
+        public AccountController(
+             IUserService userService,
+             IAuthenticationService authenticationService)
         {
+            _userService = userService;
+            _authenticationService = authenticationService;
         }
 
 
@@ -59,41 +66,22 @@ namespace DellaSanta.Controllers
         {
             if (ModelState.IsValid)
             {
-                bool result = ValidateCredentials(model); // _activeDirectoryService.ValidateCredentials(model.Domain, model.UserName, model.Password);
+                bool result = await _userService.ValidateCredentialsAsync(model.Email, model.Password);
+                //bool result = ValidateCredentials(model); // _activeDirectoryService.ValidateCredentials(model.Domain, model.UserName, model.Password);
                 if (result)
                 {
-                    //var user = await _userService.GetUserByUserNameAsync(model.UserName);
-                    var user = _applicationDbContext.Users.First(x => x.UserName == model.Email);
+                    var user = await _userService.GetUserByUserNameAsync(model.Email);
+                    //var user = _applicationDbContext.Users.First(x => x.UserName == model.Email);
 
 
                     if (user != null && user.Active)
                     {
-                        //var roleNames = user.Roles.Select(r => r.Name).ToList();
                         var role = user.Role;
-                        //        _authenticationService.SignIn(user, roleNames);
+                        _authenticationService.SignIn(user);
 
                         //sign in
-                        var claims = new List<Claim> {
-                            new Claim(ClaimTypes.Name, model.Email),
-                            new Claim(ClaimTypes.Email, model.Email),
-                            new Claim(ClaimTypes.Sid, user.UserId.ToString()),
-                            new Claim(ClaimTypes.GivenName, user.FirstName ?? "Admin"),
-                            new Claim(ClaimTypes.Surname, user.LastName ?? "Admin"),
-                            new Claim(ClaimTypes.Role, user.Role),
-                        };
+                   
 
-                        foreach (var item in user.Claims)
-                        {
-                            claims.Add(new Claim(item.ClaimType, item.ClaimValue));
-                        }
-
-                        var identity = new ClaimsIdentity(claims, "ApplicationCookie");
-
-                        var context = Request.GetOwinContext();
-                        var authManager = context.Authentication;
-
-                        authManager.SignIn(new AuthenticationProperties
-                        { IsPersistent = model.RememberMe }, identity);
 
                         //        _log.Info($"Login Successful: {user.UserName}");
 
