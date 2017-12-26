@@ -40,16 +40,28 @@ namespace DellaSanta.Services
             return await query.FirstOrDefaultAsync();
         }
 
+        public async Task<IList<CoursePath>> GetCoursePathsAsync()
+        {
+            return await _applicationDbContext.CoursePaths.ToListAsync<CoursePath>() as IList<CoursePath>;
+        }
+
+        public async Task<IList<Course>> GetCoursesAsync(string path)
+        {
+            var nrPath = Int32.Parse(path);
+            var courses = await _applicationDbContext.Courses.Where(x => x.CoursePathId == nrPath).ToListAsync<Course>();
+            if (courses?.Count() > 0)
+                return courses as IList<Course>;
+            else
+                return new List<Course>();
+        }
         public async Task<int> AddUserAsync(User user)
         {
             using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
             {
                 try
                 {
-                   _applicationDbContext.Users.Add(user);
-                    
+                    _applicationDbContext.Users.Add(user);
                     var result = await _applicationDbContext.SaveChangesAsync();
-
                     if (result > 0)
                     {
                         identitydbContextTransaction.Commit();
@@ -63,12 +75,47 @@ namespace DellaSanta.Services
                 {
                     identitydbContextTransaction.Rollback();
                     return -1;
-             
+
                 }
             }
+        }
 
+
+        public async Task<int> AddClassAsync(EnrolledClass enrolledClass)
+        {
+            try
+            {
+                var course = _applicationDbContext.Courses.Where(x => x.CourseId == enrolledClass.CourseId).First();
+                var student = _applicationDbContext.Users.Where(x => x.UserId == enrolledClass.StudentId).First();
+                enrolledClass.Course = course;
+                enrolledClass.CourseName = course.CourseName;
+                enrolledClass.Student = student;
+                enrolledClass.StudentName = student.FirstName + " " + student.LastName;
+
+                if (0 == _applicationDbContext.EnrolledClasses.Where(x => x.CourseId == course.CourseId && x.StudentId == student.UserId).Count())
+                {
+                    _applicationDbContext.EnrolledClasses.Add(enrolledClass);
+                    var result = await _applicationDbContext.SaveChangesAsync();
+
+                    if (result > 0)
+                    {
+                        return 1;
+                    }
+                    else
+                        return -1;
+                }
+                else
+                    return 1;
+
+            }
+            catch (Exception e)
+            {
+                return -1;
+
+            }
 
         }
+
 
 
         //public async Task<IPagedList<User>> GetUsersAsync(UserPagedDataRequest request)

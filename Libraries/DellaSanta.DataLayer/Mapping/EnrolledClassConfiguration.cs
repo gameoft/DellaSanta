@@ -23,7 +23,7 @@ namespace DellaSanta.DataLayer
             Property(c => c.ExamDate)
               .IsOptional();
 
-            Property(c => c.ExamGrade)
+            Property(c => c.CourseName)
               .IsOptional();
             
             HasRequired<User>(x => x.Student)

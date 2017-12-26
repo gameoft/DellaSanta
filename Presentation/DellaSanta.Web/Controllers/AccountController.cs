@@ -81,9 +81,12 @@ namespace DellaSanta.Controllers
         }
         
         [AllowAnonymous]
-        public ActionResult Register()
+        public async Task<ActionResult> Register()
         {
-            return View();
+            var coursePaths = await _userService.GetCoursePathsAsync();
+            var listpaths = coursePaths.Select(x => new SelectListItem { Value = x.CoursePathId.ToString(), Text = x.CoursePathName }).ToList();
+
+            return View(new RegisterViewModel { Paths = listpaths });
         }
 
         [Authorize(Roles = "Admin")]
@@ -124,54 +127,8 @@ namespace DellaSanta.Controllers
 
         }
 
-
-
-        //try
-        //{
-        //    var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName };
-        //    var result = await UserManager.CreateAsync(user, model.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        IdentityResult result1 = null;
-        //        IdentityResult result2 = null;
-        //        if (0 == user.Claims.Where(c => c.ClaimType == "Department").Count())
-        //        {
-        //            result1 = await UserManager.AddClaimAsync(user.Id, new Claim("Department", model.Department));
-        //        }
-        //        if (0 == user.Claims.Where(c => c.ClaimType == "MobilePhone").Count())
-        //        {
-        //            result2 = await UserManager.AddClaimAsync(user.Id, new Claim("MobilePhone", model.MobilePhone));
-        //        }
-
-        //        if (result1.Succeeded && result2.Succeeded)
-        //        {
-        //            identitydbContextTransaction.Commit();
-
-        //            return RedirectToAction("Index", "Home");
-        //        }
-        //        if (!result1.Succeeded)
-        //            AddErrors(result1);
-        //        if (!result2.Succeeded)
-        //            AddErrors(result2);
-
-        //    }
-        //    else
-        //        ModelState.AddModelError("", "User not saved. Please retry in 5 minutes.");
-
-        //}
-        //catch (Exception)
-        //{
-        //    identitydbContextTransaction.Rollback();
-        //    ModelState.AddModelError("", "Unhandled exception. Please retry in 5 minutes.");
-        //}
-
-
-
-
-
-
-        //
-        // POST: /Account/Register
+        
+    
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -181,6 +138,7 @@ namespace DellaSanta.Controllers
             {
                 User user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Student" };
                 user.Claims.Add(new UserClaims { ClaimType = ClaimTypes.StreetAddress, ClaimValue = model.Address });
+                user.Claims.Add(new UserClaims { ClaimType = "SelectedPath", ClaimValue = model.SelectedPath });
                 var res = await _userService.AddUserAsync(user);
                 if (res > 0)
                 {

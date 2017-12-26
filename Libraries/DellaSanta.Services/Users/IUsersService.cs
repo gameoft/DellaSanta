@@ -15,6 +15,13 @@ namespace DellaSanta.Services
 
         Task<int> AddUserAsync(User user);
 
+        Task<IList<CoursePath>> GetCoursePathsAsync();
+
+        Task<IList<Course>> GetCoursesAsync(string path);
+
+        Task<int> AddClassAsync(EnrolledClass enrolledClass);
+        
+
         //Task<IPagedList<User>> GetUsersAsync(UserPagedDataRequest request);
 
 

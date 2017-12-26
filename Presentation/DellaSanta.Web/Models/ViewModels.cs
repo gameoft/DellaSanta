@@ -46,6 +46,21 @@ namespace DellaSanta.Models
     //    public string Email { get; set; }
     //}
 
+    public class CourseEnrollmentViewModel
+    {
+        [Required]
+        public string UserId { get; set; }
+
+        [Required]
+        [Display(Name = "Course")]
+        public string CourseId { get; set; }
+
+        public ICollection<System.Web.Mvc.SelectListItem> Courses { get; set; }
+
+    }
+
+
+
     public class LoginViewModel
     {
         [Required]
@@ -87,6 +102,9 @@ namespace DellaSanta.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        public string SelectedPath { get; set; }
+        public ICollection<System.Web.Mvc.SelectListItem> Paths { get; set; }
     }
 
     public class RegisterTeacherViewModel
