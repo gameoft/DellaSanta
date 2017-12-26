@@ -7,6 +7,7 @@ namespace DellaSanta.Migrations
     using System.Security.Claims;
     using DellaSanta.Core;
     using DellaSanta.DataLayer;
+    using DellaSanta.Services;
 
 
     internal sealed class Configuration : DbMigrationsConfiguration<ApplicationDbContext>
@@ -28,13 +29,13 @@ namespace DellaSanta.Migrations
             //if (context.Users.Where(r => r.UserName == "admin@school.com").Count() == 0)
             context.Users.AddOrUpdate(
                 c => c.UserId,
-                new User { UserName = "admin@school.com", Password = "admin", Role = "Admin", Active = true, UserId = 1 });
+                new User { UserName = "admin@school.com", Password = Utils.Hash("admin"), Role = "Admin", Active = true, UserId = 1 });
             
             //User Teacher
             //if (context.Users.Where(r => r.UserName == "teacher1").Count() == 0)
                 context.Users.AddOrUpdate(
                     c => c.UserId,
-                    new User { UserName = "teacher1@school.com", Password = "school", Role = "Teacher", Active = true, UserId = 2, FirstName="T1Name", LastName="T1Surname" });
+                    new User { UserName = "teacher1@school.com", Password = Utils.Hash("school"), Role = "Teacher", Active = true, UserId = 2, FirstName="T1Name", LastName="T1Surname" });
 
             context.Claims.AddOrUpdate(
                 c => c.UserId,
@@ -46,7 +47,7 @@ namespace DellaSanta.Migrations
             //if (context.Users.Where(r => r.UserName == "teacher2").Count() == 0)
             context.Users.AddOrUpdate(
                     c => c.UserId,
-                    new User { UserName = "teacher2@school.com", Password = "school", Role = "Teacher", Active = true, UserId = 3, FirstName = "T2Name", LastName = "T2Surname" });
+                    new User { UserName = "teacher2@school.com", Password = Utils.Hash("school"), Role = "Teacher", Active = true, UserId = 3, FirstName = "T2Name", LastName = "T2Surname" });
 
             context.Claims.AddOrUpdate(
             c => c.UserId,
@@ -57,7 +58,7 @@ namespace DellaSanta.Migrations
             //if (context.Users.Where(r => r.UserName == "student1").Count() == 0)
             context.Users.AddOrUpdate(
                     c => c.UserId,
-                    new User { UserName = "student1@school.com", Password = "school", Role = "Student", Active = true, UserId = 4, FirstName = "S1Name", LastName = "S1Surname" });
+                    new User { UserName = "student1@school.com", Password = Utils.Hash("school"), Role = "Student", Active = true, UserId = 4, FirstName = "S1Name", LastName = "S1Surname" });
 
             context.Claims.AddOrUpdate(
                   c => c.UserId,
@@ -67,7 +68,7 @@ namespace DellaSanta.Migrations
             //if (context.Users.Where(r => r.UserName == "student2").Count() == 0)
             context.Users.AddOrUpdate(
                     c => c.UserId,
-                    new User { UserName = "student2@school.com", Password = "school", Role = "Student", Active = true, UserId = 5, FirstName = "S2Name", LastName = "S2Surname" });
+                    new User { UserName = "student2@school.com", Password = Utils.Hash("school"), Role = "Student", Active = true, UserId = 5, FirstName = "S2Name", LastName = "S2Surname" });
 
             context.Claims.AddOrUpdate(
                   c => c.UserId,
@@ -77,13 +78,13 @@ namespace DellaSanta.Migrations
             //if (context.Users.Where(r => r.UserName == "student3").Count() == 0)
             context.Users.AddOrUpdate(
                     c => c.UserId,
-                    new User { UserName = "student3@school.com", Password = "school", Role = "Student", Active = true, UserId = 6, FirstName = "S3Name", LastName = "S3Surname" });
+                    new User { UserName = "student3@school.com", Password = Utils.Hash("school"), Role = "Student", Active = true, UserId = 6, FirstName = "S3Name", LastName = "S3Surname" });
             
 
             //if (context.Users.Where(r => r.UserName == "student4").Count() == 0)
                 context.Users.AddOrUpdate(
                     c => c.UserId,
-                    new User { UserName = "student4@school.com", Password = "school", Role = "Student", Active = true, UserId = 7, FirstName = "S4Name", LastName = "S4Surname" });
+                    new User { UserName = "student4@school.com", Password = Utils.Hash("school"), Role = "Student", Active = true, UserId = 7, FirstName = "S4Name", LastName = "S4Surname" });
 
             #endregion users
 

@@ -11,6 +11,7 @@ using DellaSanta.DataLayer;
 using System.Security.Cryptography;
 using System.Text;
 using DellaSanta.Core;
+using DellaSanta.Services;
 using System.Collections.Generic;
 
 namespace DellaSanta.Controllers
@@ -24,18 +25,13 @@ namespace DellaSanta.Controllers
         {
         }
 
-        static string Hash(string input)
-        {
-            var hash = (new SHA1Managed()).ComputeHash(Encoding.UTF8.GetBytes(input));
-            return string.Join("", hash.Select(b => b.ToString("x2")).ToArray());
-        }
 
         private bool ValidateCredentials(LoginViewModel model)
         {
             var user = _applicationDbContext.Users.Where(x => x.UserName == model.Email).FirstOrDefault();
             if (null != user)
             {
-                if (Hash(model.Password) == user.Password)
+                if (Utils.Hash(model.Password) == user.Password)
                 {
                     return true;
                 }
@@ -69,18 +65,20 @@ namespace DellaSanta.Controllers
                     //var user = await _userService.GetUserByUserNameAsync(model.UserName);
                     var user = _applicationDbContext.Users.First(x => x.UserName == model.Email);
 
+
                     if (user != null && user.Active)
                     {
                         //var roleNames = user.Roles.Select(r => r.Name).ToList();
                         var role = user.Role;
                         //        _authenticationService.SignIn(user, roleNames);
 
+                        //sign in
                         var claims = new List<Claim> {
                             new Claim(ClaimTypes.Name, model.Email),
                             new Claim(ClaimTypes.Email, model.Email),
                             new Claim(ClaimTypes.Sid, user.UserId.ToString()),
-                            new Claim(ClaimTypes.GivenName, user.FirstName),
-                            new Claim(ClaimTypes.Surname, user.LastName),
+                            new Claim(ClaimTypes.GivenName, user.FirstName ?? "Admin"),
+                            new Claim(ClaimTypes.Surname, user.LastName ?? "Admin"),
                             new Claim(ClaimTypes.Role, user.Role),
                         };
 
@@ -91,7 +89,6 @@ namespace DellaSanta.Controllers
 
                         var identity = new ClaimsIdentity(claims, "ApplicationCookie");
 
-                        
                         var context = Request.GetOwinContext();
                         var authManager = context.Authentication;
 
@@ -99,10 +96,10 @@ namespace DellaSanta.Controllers
                         { IsPersistent = model.RememberMe }, identity);
 
                         //        _log.Info($"Login Successful: {user.UserName}");
-                        
+
                         // Redirect to return URL
                         if (!string.IsNullOrEmpty(returnUrl) && !string.Equals(returnUrl, "/") && Url.IsLocalUrl(returnUrl))
-                                    return RedirectToLocal(returnUrl);
+                            return RedirectToLocal(returnUrl);
 
                         //        // User is in a role, so redirect to Administration area
                         //        if (roleNames.Contains(Constants.RoleNames.Developer) ||
@@ -110,6 +107,7 @@ namespace DellaSanta.Controllers
                         //            return RedirectToRoute("Dashboard");
 
                         return RedirectToAction("Index", "Home");
+                        //sign in
                     }
                     //_log.Info($"Authorization Fail: {model.UserName}");
                     ModelState.AddModelError("", Constants.Messages.NotAuthorized);
@@ -137,12 +135,12 @@ namespace DellaSanta.Controllers
             //        ModelState.AddModelError("", "Invalid login attempt.");
             //        return View(model);
             //}
-            
+
             //return View(model);
             return View("Login", model);
         }
 
-     
+
 
         //
         // GET: /Account/Register
@@ -152,6 +150,133 @@ namespace DellaSanta.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
+        public ActionResult RegisterTeacher()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RegisterTeacher(RegisterTeacherViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = null;
+                using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+                {
+                    try
+                    {
+
+                        user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Teacher" };
+                        _applicationDbContext.Users.Add(user);
+
+                        if (!string.IsNullOrEmpty(model.MobilePhone))
+                            _applicationDbContext.Claims.Add(new UserClaims { ClaimType = ClaimTypes.MobilePhone, ClaimValue = model.MobilePhone, User = user });
+                        if (!string.IsNullOrEmpty(model.Department))
+                            _applicationDbContext.Claims.Add(new UserClaims { ClaimType = "Department", ClaimValue = model.Department, User = user });
+
+                        var result = _applicationDbContext.SaveChangesAsync();
+
+                        if (result.Result > 0)
+                        {
+                            identitydbContextTransaction.Commit();
+                        }
+                        else
+                           ModelState.AddModelError("", "Operation failed.");
+
+                    }
+                    catch (Exception)
+                    {
+                        identitydbContextTransaction.Rollback();
+                        //    ModelState.AddModelError("", "Unhandled exception. Please retry in 5 minutes.");
+
+                        //_log.Info($"Login Fail: {model.UserName}");
+                        ModelState.AddModelError("", "Operation failed.");
+                        //throw;
+                    }
+                }
+                //sign in
+                var claims = new List<Claim> {
+                            new Claim(ClaimTypes.Name, user.UserName),
+                            new Claim(ClaimTypes.Email, user.UserName),
+                            new Claim(ClaimTypes.Sid, user.UserId.ToString()),
+                            new Claim(ClaimTypes.GivenName, user.FirstName),
+                            new Claim(ClaimTypes.Surname, user.LastName),
+                            new Claim(ClaimTypes.Role, user.Role),
+                            };
+
+                foreach (var item in user.Claims)
+                {
+                    claims.Add(new Claim(item.ClaimType, item.ClaimValue));
+                }
+
+                var identity = new ClaimsIdentity(claims, "ApplicationCookie");
+
+                var context = Request.GetOwinContext();
+                var authManager = context.Authentication;
+
+                authManager.SignIn(new AuthenticationProperties
+                { IsPersistent = false }, identity);
+
+                //        _log.Info($"Login Successful: {user.UserName}");
+
+                return RedirectToAction("Index", "Home");
+                //sign in
+            }
+
+            return View(model);
+
+        }
+
+
+
+        //try
+        //{
+        //    var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName };
+        //    var result = await UserManager.CreateAsync(user, model.Password);
+        //    if (result.Succeeded)
+        //    {
+        //        IdentityResult result1 = null;
+        //        IdentityResult result2 = null;
+        //        if (0 == user.Claims.Where(c => c.ClaimType == "Department").Count())
+        //        {
+        //            result1 = await UserManager.AddClaimAsync(user.Id, new Claim("Department", model.Department));
+        //        }
+        //        if (0 == user.Claims.Where(c => c.ClaimType == "MobilePhone").Count())
+        //        {
+        //            result2 = await UserManager.AddClaimAsync(user.Id, new Claim("MobilePhone", model.MobilePhone));
+        //        }
+
+        //        if (result1.Succeeded && result2.Succeeded)
+        //        {
+        //            identitydbContextTransaction.Commit();
+
+        //            return RedirectToAction("Index", "Home");
+        //        }
+        //        if (!result1.Succeeded)
+        //            AddErrors(result1);
+        //        if (!result2.Succeeded)
+        //            AddErrors(result2);
+
+        //    }
+        //    else
+        //        ModelState.AddModelError("", "User not saved. Please retry in 5 minutes.");
+
+        //}
+        //catch (Exception)
+        //{
+        //    identitydbContextTransaction.Rollback();
+        //    ModelState.AddModelError("", "Unhandled exception. Please retry in 5 minutes.");
+        //}
+
+
+
+
+
+
         //
         // POST: /Account/Register
         [HttpPost]
@@ -159,31 +284,78 @@ namespace DellaSanta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
+
+            //var appDbContext = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            User user = null;
             if (ModelState.IsValid)
             {
-                //var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                //var result = await UserManager.CreateAsync(user, model.Password);
-                //if (result.Succeeded)
-                //{
-                //    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                //    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                //    // Send an email with this link
-                //    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                //    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                //    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+                {
 
-                //    return RedirectToAction("Index", "Home");
-                //}
-                //AddErrors(result);
+                    try
+                    {
+                        user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Student" };
+                        _applicationDbContext.Users.Add(user);
+                        _applicationDbContext.Claims.Add(new UserClaims { ClaimType = ClaimTypes.StreetAddress, ClaimValue = model.Address, User = user });
+                        var result = _applicationDbContext.SaveChangesAsync();
+
+                        if (result.Result > 0)
+                        {
+                            identitydbContextTransaction.Commit();
+
+                        }
+                        else
+                            ModelState.AddModelError("", "Operation failed.");
+
+
+                    }
+                    catch (Exception)
+                    {
+                        identitydbContextTransaction.Rollback();
+                        //_log.Info($"Login Fail: {model.UserName}");
+                        ModelState.AddModelError("", "Operation failed.");
+                        //throw;
+                    }
+                }
+
+
+                //sign in
+                var claims = new List<Claim> {
+                            new Claim(ClaimTypes.Name, user.UserName),
+                            new Claim(ClaimTypes.Email, user.UserName),
+                            new Claim(ClaimTypes.Sid, user.UserId.ToString()),
+                            new Claim(ClaimTypes.GivenName, user.FirstName),
+                            new Claim(ClaimTypes.Surname, user.LastName),
+                            new Claim(ClaimTypes.Role, user.Role),
+                            };
+
+                foreach (var item in user.Claims)
+                {
+                    claims.Add(new Claim(item.ClaimType, item.ClaimValue));
+                }
+
+                var identity = new ClaimsIdentity(claims, "ApplicationCookie");
+
+                var context = Request.GetOwinContext();
+                var authManager = context.Authentication;
+
+                authManager.SignIn(new AuthenticationProperties
+                { IsPersistent = false }, identity);
+
+                //        _log.Info($"Login Successful: {user.UserName}");
+
+                return RedirectToAction("Index", "Home");
+                //sign in
+
+
             }
 
             // If we got this far, something failed, redisplay form
             return View(model);
         }
 
-     
-     
+
+
 
         //
         // POST: /Account/LogOff
@@ -203,7 +375,7 @@ namespace DellaSanta.Controllers
 
         }
 
-      
+
 
         //protected override void Dispose(bool disposing)
         //{
@@ -236,7 +408,7 @@ namespace DellaSanta.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
-             
+
 
         private ActionResult RedirectToLocal(string returnUrl)
         {

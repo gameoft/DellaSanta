@@ -29,9 +29,6 @@ namespace DellaSanta.DataLayer
 
             Property(c => c.Password)
              .IsRequired();
-            
-            Property(c => c.Password)
-              .IsRequired();
 
             Property(c => c.Role)
               .HasMaxLength(10)

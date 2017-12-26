@@ -206,7 +206,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -267,6 +266,7 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Account\RegisterTeacher.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -282,6 +282,10 @@
     <ProjectReference Include="..\..\Libraries\DellaSanta.DataLayer\DellaSanta.DataLayer.csproj">
       <Project>{f9764193-bb68-481e-ac6f-5e8ff97c894e}</Project>
       <Name>DellaSanta.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\DellaSanta.Services\DellaSanta.Services.csproj">
+      <Project>{0d9b1ce9-2e87-4adf-b9fe-01146d803032}</Project>
+      <Name>DellaSanta.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

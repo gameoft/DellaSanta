@@ -61,10 +61,6 @@
     <Compile Include="Migrations\201712261017082_courses2.Designer.cs">
       <DependentUpon>201712261017082_courses2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201712261019337_courses3.cs" />
-    <Compile Include="Migrations\201712261019337_courses3.Designer.cs">
-      <DependentUpon>201712261019337_courses3.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201712261036052_courses4.cs" />
     <Compile Include="Migrations\201712261036052_courses4.Designer.cs">
       <DependentUpon>201712261036052_courses4.cs</DependentUpon>
@@ -81,6 +77,10 @@
       <Project>{605a6320-f7ec-4fa1-8543-3122065a758c}</Project>
       <Name>DellaSanta.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DellaSanta.Services\DellaSanta.Services.csproj">
+      <Project>{0d9b1ce9-2e87-4adf-b9fe-01146d803032}</Project>
+      <Name>DellaSanta.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201712252244010_initial.resx">
@@ -88,9 +88,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712261017082_courses2.resx">
       <DependentUpon>201712261017082_courses2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712261019337_courses3.resx">
-      <DependentUpon>201712261019337_courses3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712261036052_courses4.resx">
       <DependentUpon>201712261036052_courses4.cs</DependentUpon>
