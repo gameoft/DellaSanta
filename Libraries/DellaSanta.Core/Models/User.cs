@@ -8,6 +8,10 @@ namespace DellaSanta.Core
 {
     public class User
     {
+        public User()
+        {
+            Claims = new List<UserClaims>();
+        }
         public int UserId { get; set; }
         public string UserName { get; set; }
         public string FirstName { get; set; }

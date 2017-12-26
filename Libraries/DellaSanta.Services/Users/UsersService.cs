@@ -40,6 +40,37 @@ namespace DellaSanta.Services
             return await query.FirstOrDefaultAsync();
         }
 
+        public async Task<int> AddUserAsync(User user)
+        {
+            using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+            {
+                try
+                {
+                   _applicationDbContext.Users.Add(user);
+                    
+                    var result = await _applicationDbContext.SaveChangesAsync();
+
+                    if (result > 0)
+                    {
+                        identitydbContextTransaction.Commit();
+                        return user.UserId;
+                    }
+                    else
+                        return -1;
+
+                }
+                catch (Exception)
+                {
+                    identitydbContextTransaction.Rollback();
+                    return -1;
+             
+                }
+            }
+
+
+        }
+
+
         //public async Task<IPagedList<User>> GetUsersAsync(UserPagedDataRequest request)
         //{
         //    var query = _repository.Entities.AsQueryable();
@@ -74,16 +105,7 @@ namespace DellaSanta.Services
         //    return await query.FirstOrDefaultAsync();
         //}
 
-        //public async Task<int> AddUserAsync(User user)
-        //{
-        //    if (user == null)
-        //        throw new ArgumentNullException(nameof(user));
 
-        //    _repository.Entities.Add(user);
-        //    await _repository.SaveChangesAsync();
-
-        //    return user.Id;
-        //}
 
         //public async Task UpdateUserAsync(User user)
         //{

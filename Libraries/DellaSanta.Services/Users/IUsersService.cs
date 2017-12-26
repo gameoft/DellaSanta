@@ -13,13 +13,15 @@ namespace DellaSanta.Services
 
         Task<User> GetUserByUserNameAsync(string userName);
 
+        Task<int> AddUserAsync(User user);
+
         //Task<IPagedList<User>> GetUsersAsync(UserPagedDataRequest request);
 
 
 
         //Task<User> GetUserByIdAsync(int userId);
 
-        //Task<int> AddUserAsync(User user);
+
 
         //Task UpdateUserAsync(User user);
 

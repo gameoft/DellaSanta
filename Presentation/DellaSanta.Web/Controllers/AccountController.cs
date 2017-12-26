@@ -31,25 +31,8 @@ namespace DellaSanta.Controllers
             _userService = userService;
             _authenticationService = authenticationService;
         }
-
-
-        private bool ValidateCredentials(LoginViewModel model)
-        {
-            var user = _applicationDbContext.Users.Where(x => x.UserName == model.Email).FirstOrDefault();
-            if (null != user)
-            {
-                if (Utils.Hash(model.Password) == user.Password)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-
-        }
-
-        //
-        // GET: /Account/Login
+        
+        
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -57,8 +40,7 @@ namespace DellaSanta.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Login
+        
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -67,22 +49,12 @@ namespace DellaSanta.Controllers
             if (ModelState.IsValid)
             {
                 bool result = await _userService.ValidateCredentialsAsync(model.Email, model.Password);
-                //bool result = ValidateCredentials(model); // _activeDirectoryService.ValidateCredentials(model.Domain, model.UserName, model.Password);
                 if (result)
                 {
                     var user = await _userService.GetUserByUserNameAsync(model.Email);
-                    //var user = _applicationDbContext.Users.First(x => x.UserName == model.Email);
-
-
                     if (user != null && user.Active)
                     {
-                        var role = user.Role;
                         _authenticationService.SignIn(user);
-
-                        //sign in
-                   
-
-
                         //        _log.Info($"Login Successful: {user.UserName}");
 
                         // Redirect to return URL
@@ -95,7 +67,6 @@ namespace DellaSanta.Controllers
                         //            return RedirectToRoute("Dashboard");
 
                         return RedirectToAction("Index", "Home");
-                        //sign in
                     }
                     //_log.Info($"Authorization Fail: {model.UserName}");
                     ModelState.AddModelError("", Constants.Messages.NotAuthorized);
@@ -106,32 +77,10 @@ namespace DellaSanta.Controllers
                     ModelState.AddModelError("", "Incorrect username or password.");
                 }
             }
-
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            //var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            //switch (result)
-            //{
-            //    case SignInStatus.Success:
-            //        return RedirectToLocal(returnUrl);
-            //    case SignInStatus.LockedOut:
-            //        return View("Lockout");
-            //    case SignInStatus.RequiresVerification:
-            //        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-            //    case SignInStatus.Failure:
-            //    default:
-            //        ModelState.AddModelError("", "Invalid login attempt.");
-            //        return View(model);
-            //}
-
-            //return View(model);
+            
             return View("Login", model);
         }
-
-
-
-        //
-        // GET: /Account/Register
+        
         [AllowAnonymous]
         public ActionResult Register()
         {
@@ -152,67 +101,24 @@ namespace DellaSanta.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = null;
-                using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+                 
+                User user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Teacher" };
+                if (!string.IsNullOrEmpty(model.MobilePhone)) 
+                    user.Claims.Add(new UserClaims { ClaimType = ClaimTypes.MobilePhone, ClaimValue = model.MobilePhone });
+                if (!string.IsNullOrEmpty(model.Department))
+                    user.Claims.Add(new UserClaims { ClaimType = "Department", ClaimValue = model.Department });
+                
+                var result = await _userService.AddUserAsync(user);
+                if (result > 0)
                 {
-                    try
-                    {
-
-                        user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Teacher" };
-                        _applicationDbContext.Users.Add(user);
-
-                        if (!string.IsNullOrEmpty(model.MobilePhone))
-                            _applicationDbContext.Claims.Add(new UserClaims { ClaimType = ClaimTypes.MobilePhone, ClaimValue = model.MobilePhone, User = user });
-                        if (!string.IsNullOrEmpty(model.Department))
-                            _applicationDbContext.Claims.Add(new UserClaims { ClaimType = "Department", ClaimValue = model.Department, User = user });
-
-                        var result = _applicationDbContext.SaveChangesAsync();
-
-                        if (result.Result > 0)
-                        {
-                            identitydbContextTransaction.Commit();
-                        }
-                        else
-                           ModelState.AddModelError("", "Operation failed.");
-
-                    }
-                    catch (Exception)
-                    {
-                        identitydbContextTransaction.Rollback();
-                        //    ModelState.AddModelError("", "Unhandled exception. Please retry in 5 minutes.");
-
-                        //_log.Info($"Login Fail: {model.UserName}");
-                        ModelState.AddModelError("", "Operation failed.");
-                        //throw;
-                    }
+                    //_authenticationService.SignIn(user);
+                    ModelState.AddModelError("", "User successfully saved.");
+                    return View(new RegisterTeacherViewModel());
+                    //return RedirectToAction("Index", "Home");
                 }
-                //sign in
-                var claims = new List<Claim> {
-                            new Claim(ClaimTypes.Name, user.UserName),
-                            new Claim(ClaimTypes.Email, user.UserName),
-                            new Claim(ClaimTypes.Sid, user.UserId.ToString()),
-                            new Claim(ClaimTypes.GivenName, user.FirstName),
-                            new Claim(ClaimTypes.Surname, user.LastName),
-                            new Claim(ClaimTypes.Role, user.Role),
-                            };
-
-                foreach (var item in user.Claims)
-                {
-                    claims.Add(new Claim(item.ClaimType, item.ClaimValue));
-                }
-
-                var identity = new ClaimsIdentity(claims, "ApplicationCookie");
-
-                var context = Request.GetOwinContext();
-                var authManager = context.Authentication;
-
-                authManager.SignIn(new AuthenticationProperties
-                { IsPersistent = false }, identity);
-
-                //        _log.Info($"Login Successful: {user.UserName}");
-
-                return RedirectToAction("Index", "Home");
-                //sign in
+                else
+                    ModelState.AddModelError("", "User not saved. Please retry in 5 minutes or contact the administrator.");
+                
             }
 
             return View(model);
@@ -272,70 +178,19 @@ namespace DellaSanta.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
-
-            //var appDbContext = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
-            User user = null;
             if (ModelState.IsValid)
             {
-                using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+                User user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Student" };
+                user.Claims.Add(new UserClaims { ClaimType = ClaimTypes.StreetAddress, ClaimValue = model.Address });
+                var res = await _userService.AddUserAsync(user);
+                if (res > 0)
                 {
-
-                    try
-                    {
-                        user = new User { UserName = model.Email, Active = true, FirstName = model.FirstName, LastName = model.LastName, Password = Utils.Hash(model.Password), Role = "Student" };
-                        _applicationDbContext.Users.Add(user);
-                        _applicationDbContext.Claims.Add(new UserClaims { ClaimType = ClaimTypes.StreetAddress, ClaimValue = model.Address, User = user });
-                        var result = _applicationDbContext.SaveChangesAsync();
-
-                        if (result.Result > 0)
-                        {
-                            identitydbContextTransaction.Commit();
-
-                        }
-                        else
-                            ModelState.AddModelError("", "Operation failed.");
-
-
-                    }
-                    catch (Exception)
-                    {
-                        identitydbContextTransaction.Rollback();
-                        //_log.Info($"Login Fail: {model.UserName}");
-                        ModelState.AddModelError("", "Operation failed.");
-                        //throw;
-                    }
+                    _authenticationService.SignIn(user);
+                    return RedirectToAction("Index", "Home");
                 }
-
-
-                //sign in
-                var claims = new List<Claim> {
-                            new Claim(ClaimTypes.Name, user.UserName),
-                            new Claim(ClaimTypes.Email, user.UserName),
-                            new Claim(ClaimTypes.Sid, user.UserId.ToString()),
-                            new Claim(ClaimTypes.GivenName, user.FirstName),
-                            new Claim(ClaimTypes.Surname, user.LastName),
-                            new Claim(ClaimTypes.Role, user.Role),
-                            };
-
-                foreach (var item in user.Claims)
-                {
-                    claims.Add(new Claim(item.ClaimType, item.ClaimValue));
-                }
-
-                var identity = new ClaimsIdentity(claims, "ApplicationCookie");
-
-                var context = Request.GetOwinContext();
-                var authManager = context.Authentication;
-
-                authManager.SignIn(new AuthenticationProperties
-                { IsPersistent = false }, identity);
-
-                //        _log.Info($"Login Successful: {user.UserName}");
-
-                return RedirectToAction("Index", "Home");
-                //sign in
-
-
+                else
+                    ModelState.AddModelError("", "User not saved. Please retry in 5 minutes or contact the administrator.");
+                
             }
 
             // If we got this far, something failed, redisplay form
