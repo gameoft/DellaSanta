@@ -21,9 +21,9 @@ namespace DellaSanta
         protected void Application_Start()
         {
             RegisterDependencies();
+            AutoMapperConfiguration.Initialize();
             ConfigureAntiForgeryTokens();
            
-
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
