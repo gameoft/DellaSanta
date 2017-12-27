@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DellaSanta.Services", "Libr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dellasanta.Web.Common", "Presentation\Dellasanta.Web.Common\Dellasanta.Web.Common.csproj", "{2411F60B-1D91-4E09-91FB-EC8140FE1A4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DellaSanta.Data.Tests", "Tests\DellaSanta.Data.Tests\DellaSanta.Data.Tests.csproj", "{DD9C914E-8104-4966-AF4E-B4B4EED79DC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DellaSanta.Tests", "Tests\DellaSanta.Tests\DellaSanta.Tests.csproj", "{DD9C914E-8104-4966-AF4E-B4B4EED79DC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

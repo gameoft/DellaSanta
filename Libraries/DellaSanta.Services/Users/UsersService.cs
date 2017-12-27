@@ -56,28 +56,43 @@ namespace DellaSanta.Services
         }
         public async Task<int> AddUserAsync(User user)
         {
-            using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+            try
             {
-                try
-                {
-                    _applicationDbContext.Users.Add(user);
-                    var result = await _applicationDbContext.SaveChangesAsync();
-                    if (result > 0)
-                    {
-                        identitydbContextTransaction.Commit();
-                        return user.UserId;
-                    }
-                    else
-                        return -1;
-
-                }
-                catch (Exception)
-                {
-                    identitydbContextTransaction.Rollback();
+                _applicationDbContext.Users.Add(user);
+                var result = await _applicationDbContext.SaveChangesAsync();
+                if (result > 0)
+                    return user.UserId;
+                else
                     return -1;
 
-                }
             }
+            catch (Exception)
+            {
+                return -1;
+            }
+
+            //using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
+            //{
+            //    try
+            //    {
+            //        _applicationDbContext.Users.Add(user);
+            //        var result = await _applicationDbContext.SaveChangesAsync();
+            //        if (result > 0)
+            //        {
+            //            identitydbContextTransaction.Commit();
+            //            return user.UserId;
+            //        }
+            //        else
+            //            return -1;
+
+            //    }
+            //    catch (Exception)
+            //    {
+            //        identitydbContextTransaction.Rollback();
+            //        return -1;
+
+            //    }
+            //}
         }
 
 

@@ -18,8 +18,12 @@ namespace DellaSanta.DataLayer
             //this.Configuration.LazyLoadingEnabled = false;
         }
 
+        public ApplicationDbContext(string nameOrConnectionString)
+            : base(nameOrConnectionString)
+        {
+        }
 
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<User> Users { get; set; }
         public DbSet<UserClaims> Claims { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<CoursePath> CoursePaths { get; set; }
