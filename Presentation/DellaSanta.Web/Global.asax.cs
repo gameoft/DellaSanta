@@ -13,6 +13,7 @@ using DellaSanta.Services;
 using DellaSanta.DataLayer;
 using Autofac.Integration.Mvc;
 using Dellasanta.Web.Common.Security;
+using Dellasanta.Web.Common.Automapper;
 
 namespace DellaSanta
 {
