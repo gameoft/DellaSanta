@@ -68,18 +68,27 @@ namespace DellaSanta.Controllers
 
                 EnrolledClass myClass = new EnrolledClass { CourseId = int.Parse(model.CourseId), StudentId = sid };
                 var res = await _userService.AddClassAsync(myClass);
-                
+
                 if (res > 0)
                 {
-                    return RedirectToAction("Index", "Home");
+                    return Json(true);
+                    //return View(model);
+                    //return RedirectToAction("Index", "Home");
                 }
-                else
-                    ModelState.AddModelError("", "Course not enrolled. Please retry in 5 minutes or contact the administrator.");
+
+                //NOTA questo funziona solo se NON è ajax!!!
+                //else
+                //{
+                //    TempData["MessageToClient"] = "Course not enrolled. Please retry in 5 minutes or contact the administrator.";
+                //    ModelState.AddModelError("", "Course not enrolled. Please retry in 5 minutes or contact the administrator.");
+                //}
+                    
 
             }
 
             // If we got this far, something failed, redisplay form
-            return View(model);
+            //return View(model);
+            return Json(false);
         }
 
     }

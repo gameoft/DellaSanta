@@ -6,10 +6,12 @@
 
 <h2>CourseEnrollment</h2>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "courseenrollment" }))
 {
+    <p id="MessageToClient" class="text-danger"></p>
+ 
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>CourseEnrollmentViewModel</h4>
         <hr />
@@ -34,3 +36,13 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/custom/enrollment.js"></script>
+}
+
+
+
+
