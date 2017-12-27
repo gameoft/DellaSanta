@@ -1,54 +1,87 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Web.Mvc;
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using DellaSanta;
-//using DellaSanta.Controllers;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Linq;
+using System.Security.Principal;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+using Dellasanta.Web.Common.Security;
+using DellaSanta.Controllers;
+using DellaSanta.Core;
+using DellaSanta.Models;
+using DellaSanta.Services;
+using NSubstitute;
+using NUnit.Framework;
+using System.Web;
 
-//namespace DellaSanta.Tests.Controllers
-//{
-//    [TestClass]
-//    public class HomeControllerTest
-//    {
-//        [TestMethod]
-//        public void Index()
-//        {
-//            // Arrange
-//            HomeController controller = new HomeController();
+namespace DellaSanta.Tests.Controllers
+{
+    [TestFixture]
+    public class HomeControllerTests
+    {
+        private User _user1;
+        private IUserService _userService;
+   
+        [SetUp]
+        public void SetUp()
+        {
 
-//            // Act
-//            ViewResult result = controller.Index() as ViewResult;
+            _user1 = new User
+            {
+                UserId = 1,
+                UserName = "johndoe",
+                FirstName = "John",
+                LastName = "Doe",
+                Active = true,
+                Password = "70374248fd7129088fef42b8f568443f6dce3a48", // "xxxxxxxxx",
+                Role = "Student"
+            };
 
-//            // Assert
-//            Assert.IsNotNull(result);
-//        }
+            _userService = Substitute.For<IUserService>();
+        }
 
-//        [TestMethod]
-//        public void About()
-//        {
-//            // Arrange
-//            HomeController controller = new HomeController();
+     
+        [Test]
+        public async Task CourseEnrollment_PostValidData_ReturnOK()
+        {
+            // Arrange
+            _userService.AddClassAsync(Arg.Any<EnrolledClass>()).Returns(1);
+            
+            var sut = new HomeController(_userService);
 
-//            // Act
-//            ViewResult result = controller.About() as ViewResult;
+            var identity = Substitute.For<ClaimsIdentity>();
+            identity.Claims.Returns(new List<Claim> { new Claim(ClaimTypes.Sid, "1") } );
+            
+            var userMock = Substitute.For<IPrincipal>();
+            userMock.Identity.Returns(identity);
 
-//            // Assert
-//            Assert.AreEqual("Your application description page.", result.ViewBag.Message);
-//        }
+            //var contextMock = Substitute.For<HttpContextBase>();
+            //contextMock.User.Returns(userMock);
+                        
+            var webCtx = Substitute.For<ControllerContext>();
+            webCtx.HttpContext.User.Returns(userMock);
+            webCtx.HttpContext.Request.IsAuthenticated.Returns(true);
+            
+            sut.ControllerContext = webCtx;
 
-//        [TestMethod]
-//        public void Contact()
-//        {
-//            // Arrange
-//            HomeController controller = new HomeController();
+            var model = new CourseEnrollmentViewModel { CourseId = "1", UserId = "1" };
 
-//            // Act
-//            ViewResult result = controller.Contact() as ViewResult;
+            // Act
+            var result = await sut.CourseEnrollment(model) as JsonResult;
 
-//            // Assert
-//            Assert.IsNotNull(result);
-//        }
-//    }
-//}
+
+            // Assert
+
+            await _userService.Received(1).AddClassAsync(Arg.Any<EnrolledClass>());
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue((bool)result.Data);
+         
+         
+        }
+
+     
+
+
+    }
+}

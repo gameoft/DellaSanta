@@ -33,10 +33,13 @@ namespace DellaSanta.Controllers
         
         
         [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        public  ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            //return View();
+                       
+            var model = new LoginViewModel();
+            return View("Login", model);
         }
 
         

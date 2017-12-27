@@ -115,6 +115,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\AccountControllerTests.cs" />
+    <Compile Include="Controllers\MockHelper.cs" />
     <Compile Include="Data\PersistenceTests.cs" />
     <Compile Include="Data\UserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -150,6 +152,10 @@
     <ProjectReference Include="..\..\Libraries\DellaSanta.Services\DellaSanta.Services.csproj">
       <Project>{0d9b1ce9-2e87-4adf-b9fe-01146d803032}</Project>
       <Name>DellaSanta.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Presentation\Dellasanta.Web.Common\Dellasanta.Web.Common.csproj">
+      <Project>{2411f60b-1d91-4e09-91fb-ec8140fe1a4b}</Project>
+      <Name>Dellasanta.Web.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Presentation\DellaSanta.Web\DellaSanta.Web.csproj">
       <Project>{7B5A27F9-B8C9-4D58-ACD7-111BBF502FBC}</Project>
