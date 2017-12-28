@@ -28,7 +28,7 @@ namespace DellaSanta.DataLayer
         public DbSet<Course> Courses { get; set; }
         public DbSet<CoursePath> CoursePaths { get; set; }
         public DbSet<EnrolledClass> EnrolledClasses { get; set; }
-
+        public DbSet<LogEntry> LogEntries { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -37,7 +37,7 @@ namespace DellaSanta.DataLayer
             modelBuilder.Configurations.Add(new CourseConfiguration());
             modelBuilder.Configurations.Add(new CoursePathConfiguration());
             modelBuilder.Configurations.Add(new EnrolledClassConfiguration());
-
+            modelBuilder.Configurations.Add(new LogEntryConfiguration());
 
             base.OnModelCreating(modelBuilder); 
         }

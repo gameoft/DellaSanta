@@ -51,6 +51,7 @@
     <Compile Include="Mapping\CourseConfiguration.cs" />
     <Compile Include="Mapping\CoursePathConfiguration.cs" />
     <Compile Include="Mapping\EnrolledClassConfiguration.cs" />
+    <Compile Include="Mapping\LogEntryConfiguration.cs" />
     <Compile Include="Mapping\UserClaimsConfiguration.cs" />
     <Compile Include="Mapping\UserConfiguration.cs" />
     <Compile Include="Migrations\201712252244010_initial.cs" />
@@ -80,6 +81,14 @@
     <Compile Include="Migrations\201712272308218_added_department.cs" />
     <Compile Include="Migrations\201712272308218_added_department.Designer.cs">
       <DependentUpon>201712272308218_added_department.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281054535_logdate.cs" />
+    <Compile Include="Migrations\201712281054535_logdate.Designer.cs">
+      <DependentUpon>201712281054535_logdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281241187_Tests.cs" />
+    <Compile Include="Migrations\201712281241187_Tests.Designer.cs">
+      <DependentUpon>201712281241187_Tests.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -116,6 +125,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712272308218_added_department.resx">
       <DependentUpon>201712272308218_added_department.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281054535_logdate.resx">
+      <DependentUpon>201712281054535_logdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281241187_Tests.resx">
+      <DependentUpon>201712281241187_Tests.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

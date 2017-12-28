@@ -4,8 +4,11 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dellasanta.Logging;
 using DellaSanta.Core;
 using DellaSanta.DataLayer;
+using DellaSanta.Logging;
+using log4net;
 
 namespace DellaSanta.Services
 {
@@ -13,10 +16,12 @@ namespace DellaSanta.Services
     {
         //private readonly IRepository<User> _repository;
         private ApplicationDbContext _applicationDbContext;
+        private readonly ILog _log;
 
-        public UserService(ApplicationDbContext applicationDbContext)
+        public UserService(ApplicationDbContext applicationDbContext, ILogManager logManager)
         {
             _applicationDbContext = applicationDbContext;
+            _log = logManager.GetLog(typeof(UserService));
         }
 
         public async Task<bool> ValidateCredentialsAsync(string userName, string password)
@@ -26,9 +31,11 @@ namespace DellaSanta.Services
             {
                 if (Utils.Hash(password) == user.Password)
                 {
+                    Log4NetHelper.Log(_log, "Login successful for user", LogLevel.INFO, userName, user.UserId, null, null);
                     return true;
                 }
             }
+            Log4NetHelper.Log(_log, "Login invalid credentials", LogLevel.WARN, userName + " | " + password, 0, null, null);
             return false;
         }
 
@@ -71,6 +78,7 @@ namespace DellaSanta.Services
                 return -1;
             }
 
+            //transaction necessary when using asp.net identity that uses atomic transactions on the usermanager, when wanting to update other tables as well
             //using (var identitydbContextTransaction = _applicationDbContext.Database.BeginTransaction())
             //{
             //    try

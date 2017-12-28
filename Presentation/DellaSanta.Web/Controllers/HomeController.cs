@@ -5,24 +5,33 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using DellaSanta.Core;
+using Dellasanta.Logging;
 using DellaSanta.Models;
+using DellaSanta.Core;
+using DellaSanta.Logging;
 using DellaSanta.Services;
+using log4net;
 
 namespace DellaSanta.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IUserService _userService;
+        private readonly ILog _log;
 
         public HomeController(
-           IUserService userService)
+           IUserService userService,
+           ILogManager logManager)
         {
             _userService = userService;
+            _log = logManager.GetLog(typeof(HomeController));
         }
 
         public ActionResult Index()
         {
+           
+            Log4NetHelper.Log(_log, "Index", LogLevel.INFO, null, 0, HttpContext.User.Identity.Name, null);
+
             return View();
         }
 

@@ -15,6 +15,7 @@ using DellaSanta.Services;
 using System.Collections.Generic;
 using Dellasanta.Web.Common.Security;
 
+
 namespace DellaSanta.Controllers
 {
     [Authorize]
@@ -37,7 +38,8 @@ namespace DellaSanta.Controllers
         {
             ViewBag.ReturnUrl = returnUrl;
             //return View();
-                       
+            
+
             var model = new LoginViewModel();
             return View("Login", model);
         }

@@ -36,6 +36,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -59,6 +62,10 @@
     <ProjectReference Include="..\DellaSanta.DataLayer\DellaSanta.DataLayer.csproj">
       <Project>{f9764193-bb68-481e-ac6f-5e8ff97c894e}</Project>
       <Name>DellaSanta.DataLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DellaSanta.Logging\DellaSanta.Logging.csproj">
+      <Project>{0ae6d27f-d096-4bd8-96f0-78eec080ef78}</Project>
+      <Name>DellaSanta.Logging</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

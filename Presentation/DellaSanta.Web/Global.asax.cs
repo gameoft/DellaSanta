@@ -14,6 +14,7 @@ using DellaSanta.DataLayer;
 using Autofac.Integration.Mvc;
 using Dellasanta.Web.Common.Security;
 using Dellasanta.Web.Common.Automapper;
+using DellaSanta.Logging;
 
 namespace DellaSanta
 {
@@ -36,14 +37,17 @@ namespace DellaSanta
             var builder = new ContainerBuilder();
             string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
 
-            //ConfigureLog4Net(builder, connectionString);
-
+            //// Register controllers
+            //builder.RegisterControllers(typeof(Global).Assembly);
             // Register your MVC controllers. (MvcApplication is the name of
             // the class in Global.asax.)
             builder.RegisterControllers(typeof(MvcApplication).Assembly);
 
             // OPTIONAL: Register web abstractions like HttpContextBase.
             builder.RegisterModule<AutofacWebTypesModule>();
+
+            Log4NetLogger.Configure(connectionString);
+            builder.Register(c => new LogManagerAdapter()).As<ILogManager>().InstancePerLifetimeScope();
 
             // HttpContext
             //builder.Register(c => new HttpContextWrapper(HttpContext.Current) as HttpContextBase).As<HttpContextBase>().InstancePerLifetimeScope();
@@ -53,6 +57,8 @@ namespace DellaSanta
             //builder.Register(c => c.Resolve<HttpContextBase>().Session).As<HttpSessionStateBase>().InstancePerLifetimeScope();
 
             // Services
+            builder.RegisterType<OwinAuthenticationService>().As<IAuthenticationService>().InstancePerLifetimeScope();
+            builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
             //builder.RegisterType<ActiveDirectoryService>().As<IActiveDirectoryService>().InstancePerLifetimeScope();
             //builder.RegisterType<DateTimeAdapter>().As<IDateTime>().InstancePerLifetimeScope();
             //builder.RegisterType<DomainService>().As<IDomainService>().InstancePerLifetimeScope();
@@ -61,13 +67,9 @@ namespace DellaSanta
             //builder.RegisterType<LogService>().As<ILogService>().InstancePerLifetimeScope();
             //builder.RegisterType<MessageService>().As<IMessageService>().InstancePerLifetimeScope();
             //builder.RegisterType<MemoryCacheService>().As<ICacheService>().SingleInstance();
-            builder.RegisterType<OwinAuthenticationService>().As<IAuthenticationService>().InstancePerLifetimeScope();
             //builder.RegisterType<RoleService>().As<IRoleService>().InstancePerLifetimeScope();
             //builder.RegisterType<SettingService>().As<ISettingService>().InstancePerLifetimeScope();
             //builder.RegisterType<TraceLogService>().As<ITraceLogService>().InstancePerLifetimeScope();
-
-            builder.RegisterType<ApplicationDbContext>().As<ApplicationDbContext>().InstancePerLifetimeScope();
-            builder.RegisterType<UserService>().As<IUserService>().InstancePerLifetimeScope();
 
 
             //// Trace listener
@@ -75,13 +77,11 @@ namespace DellaSanta
             //    .WithParameter("connectionString", connectionString)
             //    .InstancePerLifetimeScope();
 
-            //// Respository
+            //// Repository
+            builder.RegisterType<ApplicationDbContext>().As<ApplicationDbContext>().InstancePerLifetimeScope();
             //builder.RegisterGeneric(typeof(EfRepository<>)).As(typeof(IRepository<>)).InstancePerLifetimeScope();
             //builder.Register<DbContext>(c => new AppDbContext(connectionString)).InstancePerLifetimeScope();
-
-            //// Register controllers
-            //builder.RegisterControllers(typeof(Global).Assembly);
-
+          
             //// Register Mvc filters
             //builder.RegisterFilterProvider();
 
@@ -91,12 +91,8 @@ namespace DellaSanta
             
         }
 
-    private void ConfigureLog4Net(ContainerBuilder builder, string connectionString)
-        {
-            //Log4NetLogger.Configure(connectionString);
-            //builder.Register(c => new LogManagerAdapter()).As<ILogManager>().InstancePerLifetimeScope();
-        }
-
+ 
+       
         private void ConfigureAntiForgeryTokens()
         {
             // We use Owin Cookie Authentication, so we set AntiForgery token to use Name as claim types.

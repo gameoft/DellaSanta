@@ -8,6 +8,7 @@ using NSubstitute;
 using DellaSanta.Core;
 using DellaSanta.DataLayer;
 using DellaSanta.Services;
+using DellaSanta.Logging;
 
 namespace DellaSanta.Tests.Services
 {
@@ -19,6 +20,7 @@ namespace DellaSanta.Tests.Services
         private User _user3;
         private IQueryable<User> _users;
         private ApplicationDbContext _userRepository;
+        private ILogManager _log;
 
         [SetUp]
         public void SetUp()
@@ -65,13 +67,14 @@ namespace DellaSanta.Tests.Services
             var mockRepository = Substitute.For<ApplicationDbContext>();
             mockRepository.Users.Returns(mockSet);
             _userRepository = mockRepository;
+            _log = Substitute.For<ILogManager>();
         }
 
 
         [Test]
         public async Task GetUserByUserName_ValidUserName_Return1User()
         {
-            var sut = new UserService(_userRepository);
+            var sut = new UserService(_userRepository, _log);
             var user = await sut.GetUserByUserNameAsync("johndoe");
             Assert.AreEqual(_user1, user);
         }
@@ -79,7 +82,7 @@ namespace DellaSanta.Tests.Services
         [Test]
         public async Task GetUserByUserName_InvalidUsername_ReturnNull()
         {
-            var sut = new UserService(_userRepository);
+            var sut = new UserService(_userRepository, _log);
             var user = await sut.GetUserByUserNameAsync("dummynonexistant");
             Assert.IsNull(user);
         }
@@ -87,7 +90,7 @@ namespace DellaSanta.Tests.Services
         [Test]
         public async Task ValidateCredentials_ValidPassword_ReturnTrue()
         {
-            var sut = new UserService(_userRepository);
+            var sut = new UserService(_userRepository, _log);
             var isValid = await sut.ValidateCredentialsAsync("janetdoe", "xxxxxxxxx");
             Assert.IsTrue(isValid);
         }

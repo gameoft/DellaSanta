@@ -13,6 +13,7 @@ using DellaSanta.Services;
 using NSubstitute;
 using NUnit.Framework;
 using System.Web;
+using DellaSanta.Logging;
 
 namespace DellaSanta.Tests.Controllers
 {
@@ -21,7 +22,8 @@ namespace DellaSanta.Tests.Controllers
     {
         private User _user1;
         private IUserService _userService;
-   
+        private ILogManager _log;
+
         [SetUp]
         public void SetUp()
         {
@@ -38,6 +40,7 @@ namespace DellaSanta.Tests.Controllers
             };
 
             _userService = Substitute.For<IUserService>();
+            _log = Substitute.For<ILogManager>();
         }
 
      
@@ -47,7 +50,7 @@ namespace DellaSanta.Tests.Controllers
             // Arrange
             _userService.AddClassAsync(Arg.Any<EnrolledClass>()).Returns(1);
             
-            var sut = new HomeController(_userService);
+            var sut = new HomeController(_userService, _log);
 
             var identity = Substitute.For<ClaimsIdentity>();
             identity.Claims.Returns(new List<Claim> { new Claim(ClaimTypes.Sid, "1") } );

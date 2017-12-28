@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{605A6320-F7EC-4FA1-8543-3122065A758C}</ProjectGuid>
+    <ProjectGuid>{0AE6D27F-D096-4BD8-96F0-78EEC080EF78}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DellaSanta.Core</RootNamespace>
-    <AssemblyName>DellaSanta.Core</AssemblyName>
+    <RootNamespace>DellaSanta.Logging</RootNamespace>
+    <AssemblyName>DellaSanta.Logging</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,8 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -41,14 +43,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs" />
-    <Compile Include="Models\EnrolledClass.cs" />
-    <Compile Include="Models\Course.cs" />
-    <Compile Include="Models\CoursePath.cs" />
-    <Compile Include="Models\LogEntry.cs" />
-    <Compile Include="Models\User.cs" />
-    <Compile Include="Models\UserClaims.cs" />
+    <Compile Include="Log4NetHelper.cs" />
+    <Compile Include="Log4NetLogger.cs" />
+    <Compile Include="LogManagerAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
