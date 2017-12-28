@@ -15,7 +15,8 @@ namespace DellaSanta.Core
         }
         public int CoursePathId { get; set; }
         public string CoursePathName { get; set; }
-     
+        public string Department { get; set; }
+
         //public DateTime? DateOfBirth { get; set; }
         //public byte[] Photo { get; set; }
         //public decimal Height { get; set; }

@@ -11,6 +11,9 @@ namespace DellaSanta.Core
         public int CourseId { get; set; }
         public string CourseName { get; set; }
 
+        
+
+
         public virtual User Teacher { get; set; }
         public int TeacherId { get; set; }
 
